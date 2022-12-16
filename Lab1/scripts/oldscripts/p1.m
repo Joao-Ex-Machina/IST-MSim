@@ -51,4 +51,7 @@ ylabel('Concentração [mg/kg]','FontSize',12)
 title('Concentração por Tempo','FontSize',12)
 legend('c1(t)','c2(t)','d(t)','Location','Southeast');
 hold off
+
+    
+    
    

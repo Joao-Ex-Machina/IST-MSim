@@ -10,20 +10,31 @@
 +-----------------------------------------------------------------------------------------------------*/
 %}
 
+%test bench
+mdays=25;
+growthm = zeros(days,1);
+for spac=1:26 %Treatment at all days vs No treatment
+	p4test(spac,days);
+	growthm(spac)=V(25);
+	
+end
 
-p4test(1);
-p4test(2);
-p4test(3);
-p4test(4); 
-p4test(5);
-p4test(6); % original
+% plot
+figure(spac);
+		hold on
+			plot(spac,growthm);
+			xlabel('Espaçamento [Dias]','FontSize',12)
+			ylabel('Volume do Tumor ao 25º dia','FontSize',12)
+			title('Volume do Tumor ao 25º dia para tratamentos com espaçamento variável','FontSize',8)	
+		hold off
+end
 
 
-function p4test(spac)
+function p4test(spac,days)
 
 % PK and PD models on time domain
 	%Constants
-		a=3;
+		a = 3;
 		k12 = 0.3*3600;
 		k21 = 0.2455*3600;
 		k10 = 0.0643*3600;
@@ -33,24 +44,15 @@ function p4test(spac)
 		h=1;
 		c50 = 7.1903;
 	% Vectors
-		x=[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a];
+		n=days; %Maximum doses taken is a dose a day 
+		x=a * ones(n,1);
 		d=upsample(x,spac);
-		n=length(x);
 		c = zeros(n*spac,1);
 		c1 = zeros(n*spac,1);
 		c2 = zeros(n*spac,1);
 		t = zeros(n*spac,1);
 		u = zeros(n*spac,1);
-       
-       % Tumor growth dynamic
-	%Vectors
-      V = zeros(n*spac,1);
-
-	% Constants
-		a = 0.09;
-		Kt = 10;
-		b = 1;
-		V(1) = 1; % Initial tumor size
+	        u1 = zeros(n*spac,1);
 
 	%matrixes
 		m=[-(k12+k10)/v1 , k21/v1 ; k12/v2 , -k21/v2];
@@ -62,21 +64,45 @@ function p4test(spac)
         		c = m * [c1(k); c2(k)] + s * delta * d(k);
         		c1(k+1) = c1(k) + h * c(1);
         		c2(k+1) = c2(k) + h * c(2);
-			    u(k) = c2(k) / (c50 + c2(k));
-                V(k+1) = V(k)+h*(a*V(k)*(1-(V(k)/Kt))-b*u(k)*V(k));
-            end
-              u(n*spac) = c2(n*spac) / (c50 + c2(n*spac));
+			u1(k) = c2(k) / (c50 + c2(k));
+    		end
 
+	% plot
+	%	figure(1);
+	%		hold on
+	%			plot(t,u);
+	%			xlabel('Tempo [Dias]','FontSize',12)
+	%			ylabel('Efeito u(t)','FontSize',12)
+	%			title('Efeito por Tempo','FontSize',12)
+	%			legend('3mg','7mg','11mg','20mg','27mg','33mg','Location','Southeast');
+	%		hold off
 
+% Tumor growth dynamic
+	%Vectors
+      V = zeros(n*spac,1);
+
+	% Constants
+		a = 0.09;
+		Kt = 10;
+		b = 1;
+		V(1) = 1; % Initial tumor size
+
+	% Applying Euler's aproximation method to the diferential equation
+		for k = 1:(n*spac-1)
+        		t(k+1) = k*h;
+        		V(k+1) = V(k)+h*(a*V(k)*(1-(V(k)/Kt))-b*u1(k)*V(k));
+   		end
    	% plot
 		figure(spac);
 			hold on
-                yline(0.1);
-				plot(t,V,t,u);
+				plot(t,V);
+				plot(t,u1);
 				xlabel('Tempo [Dias]','FontSize',12)
 				ylabel('Volume do Tumor','FontSize',12)
 				title('Evolução do Tumor ','FontSize',12)
-				legend('10% volume','V(t)','u(t)','Location','Southeast');
+				legend('V(t)','u(t)','1','2','3','6','9','12','15','18','21');
 
 			hold off
 	end
+
+
