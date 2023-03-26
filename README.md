@@ -3,7 +3,7 @@
 MSim UC labs, post-MEPP.
 
 ## Licensing
-All reports are under CC-BY-SA
+All reports are under CC-BY-SA \
 All .m files and code are under GPLv3
 
 ## Special Thanks
